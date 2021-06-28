@@ -15,3 +15,9 @@ class Pet(models.Model):
 
     def __str__(self):
         return f'{self.name}, {self.age}, {self.type}'
+
+
+class Photo(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    file = models.ImageField(upload_to='photos/')
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
