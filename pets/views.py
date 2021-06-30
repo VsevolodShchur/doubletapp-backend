@@ -13,7 +13,7 @@ class PetView(generics.ListAPIView,
               generics.CreateAPIView,
               generics.DestroyAPIView):
     queryset = Pet.objects.all()
-    pagination_class = PetsLimitOffsetPagination
+    pagination_class = LimitOffsetPagination
     serializer_class = PetSerializer
 
     class _ErrorMessages:

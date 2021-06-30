@@ -143,5 +143,7 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT': "%Y-%m-%dT%H:%M:%S",
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'pets.authentication.ApiKeyAuthentication',
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 20
 }
