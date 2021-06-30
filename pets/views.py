@@ -5,6 +5,7 @@ from .serializers import PetSerializer, PhotoSerializer, \
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
+from rest_framework.exceptions import ParseError, NotFound
 from rest_framework import status, generics
 from django.db import IntegrityError
 import uuid
@@ -16,11 +17,6 @@ class PetView(generics.ListAPIView,
     queryset = Pet.objects.all()
     pagination_class = LimitOffsetPagination
     serializer_class = PetSerializer
-
-    class _ErrorMessages:
-        bad_has_photos_param = 'Bad "has_photos" query param, ' \
-                               'options: "true", "false".'
-        pet_id_not_found = 'Pet with the matching ID was not found.'
 
     def get(self, request, **kwargs):
         qp = PetViewGetQueryParamsSerializer(data=request.query_params)
@@ -42,21 +38,19 @@ class PetView(generics.ListAPIView,
         str_uuids = request.data['ids']
         queryset = self.get_queryset()
 
-        response = DeleteResponseData()
+        response_data = DeleteResponseData()
         for str_uuid in str_uuids:
             try:
                 pet_uuid = uuid.UUID(str_uuid)
-                pet = queryset.get(uuid=pet_uuid)
-                pet.delete()
-                # queryset.get(id=pet_uuid).delete()
+                queryset.get(uuid=pet_uuid).delete()
             except Pet.DoesNotExist:
-                response.append_error(str_uuid,
-                                      self._ErrorMessages.pet_id_not_found)
+                response_data.append_error(str_uuid,
+                                           'Pet with the matching ID was not found.')
             except Exception as e:
-                response.append_error(str_uuid, str(e))
+                response_data.append_error(str_uuid, str(e))
             else:
-                response.deleted += 1
-        serializer = DeleteResponseDataSerializer(response)
+                response_data.deleted += 1
+        serializer = DeleteResponseDataSerializer(response_data)
         return Response(data=serializer.data,
                         status=status.HTTP_204_NO_CONTENT)
 
@@ -67,14 +61,9 @@ class PhotoUploadView(generics.CreateAPIView,
     parser_classes = [MultiPartParser]
     serializer_class = PhotoSerializer
 
-    class _ErrorMessages:
-        file_not_found = 'No file in request.'
-
     def post(self, request, **kwargs):
         if 'file' not in request.data:
-            response_data = {'detail': self._ErrorMessages.file_not_found}
-            return Response(data=response_data,
-                            status=status.HTTP_400_BAD_REQUEST)
+            raise ParseError(detail='No file in request.')
 
         file = request.data['file']
         pet_uuid = kwargs.get('pet_uuid')
@@ -82,7 +71,7 @@ class PhotoUploadView(generics.CreateAPIView,
         try:
             photo.save()
         except IntegrityError:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            raise NotFound()
 
         serializer = self.get_serializer(photo, context={'request': request})
         return Response(data=serializer.data,
