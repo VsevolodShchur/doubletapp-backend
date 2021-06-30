@@ -4,6 +4,7 @@ from .models import Pet, Photo
 
 
 class PhotoSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='uuid')
     url = serializers.SerializerMethodField('get_photo_url')
 
     class Meta:
@@ -21,6 +22,7 @@ class PhotoSerializer(serializers.ModelSerializer):
 
 
 class PetSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='uuid', read_only=True)
     photos = PhotoSerializer(source='photo_set', read_only=True, many=True)
 
     class Meta:

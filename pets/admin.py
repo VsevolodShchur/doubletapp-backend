@@ -11,4 +11,4 @@ class PetAdmin(admin.ModelAdmin):
 
 @admin.register(Photo)
 class PetAdmin(admin.ModelAdmin):
-    list_display = ('id', 'pet', )
+    list_display = ('uuid', 'pet', )

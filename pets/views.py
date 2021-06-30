@@ -42,21 +42,21 @@ class PetView(generics.ListAPIView,
         return Response(data=response_data)
 
     def delete(self, request, **kwargs):
-        str_ids = request.data['ids']
+        str_uuids = request.data['ids']
         queryset = self.get_queryset()
 
         response = DeleteResponseData()
-        for str_id in str_ids:
+        for str_uuid in str_uuids:
             try:
-                pet_uuid = uuid.UUID(str_id)
-                pet = queryset.get(id=pet_uuid)
+                pet_uuid = uuid.UUID(str_uuid)
+                pet = queryset.get(uuid=pet_uuid)
                 pet.delete()
                 # queryset.get(id=pet_uuid).delete()
             except Pet.DoesNotExist:
-                response.append_error(str_id,
+                response.append_error(str_uuid,
                                       self._ErrorMessages.pet_id_not_found)
             except Exception as e:
-                response.append_error(str_id, str(e))
+                response.append_error(str_uuid, str(e))
             else:
                 response.deleted += 1
         serializer = DeleteResponseDataSerializer(response)
@@ -80,8 +80,8 @@ class PhotoUploadView(generics.CreateAPIView,
                             status=status.HTTP_400_BAD_REQUEST)
 
         file = request.data['file']
-        id = kwargs.get('id')
-        photo = Photo(file=file, pet_id=id)
+        pet_uuid = kwargs.get('pet_uuid')
+        photo = Photo(file=file, pet_id=pet_uuid)
         try:
             photo.save()
         except IntegrityError:

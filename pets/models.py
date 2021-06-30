@@ -7,7 +7,7 @@ class Pet(models.Model):
         dog = 'dog'
         cat = 'cat'
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     name = models.CharField(max_length=100)
     age = models.PositiveSmallIntegerField()
     type = models.CharField(max_length=10, choices=Pets.choices)
@@ -18,6 +18,6 @@ class Pet(models.Model):
 
 
 class Photo(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     file = models.ImageField(upload_to='photos/')
-    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, to_field='uuid')
