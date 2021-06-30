@@ -1,7 +1,7 @@
 from .models import Pet, Photo
 from .serializers import PetSerializer, PhotoSerializer, \
                          DeleteResponseDataSerializer
-from .pagination import PetsLimitOffsetPagination
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from rest_framework import status, generics
