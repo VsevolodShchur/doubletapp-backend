@@ -48,3 +48,9 @@ class DeleteResponseDataSerializer(serializers.Serializer):
     errors = serializers.ListField(
         child=serializers.DictField(child=serializers.CharField())
     )
+
+
+class PetViewGetQueryParamsSerializer(serializers.Serializer):
+    limit = serializers.IntegerField(required=False, min_value=0)
+    offset = serializers.IntegerField(required=False, min_value=0)
+    has_photos = serializers.BooleanField(required=False, default=True)

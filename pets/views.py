@@ -1,5 +1,6 @@
 from .models import Pet, Photo
 from .serializers import PetSerializer, PhotoSerializer, \
+                         PetViewGetQueryParamsSerializer, \
                          DeleteResponseDataSerializer
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
@@ -22,18 +23,14 @@ class PetView(generics.ListAPIView,
         pet_id_not_found = 'Pet with the matching ID was not found.'
 
     def get(self, request, **kwargs):
-        str_has_photos = self.request.query_params.get('has_photos')
-        if str_has_photos and str_has_photos not in ('true', 'false'):
-            response_data = dict(
-                detail=self._ErrorMessages.bad_has_photos_param)
-            return Response(data=response_data,
-                            status=status.HTTP_400_BAD_REQUEST)
+        qp = PetViewGetQueryParamsSerializer(data=request.query_params)
+        qp.is_valid(raise_exception=True)
 
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
         data = queryset if page is None else page
-        has_photos = str_has_photos is None or str_has_photos == 'true'
-        serializer_context = {'has_photos': has_photos}
+
+        serializer_context = {'has_photos': qp.validated_data['has_photos']}
         serializer = self.get_serializer(data,
                                          many=True,
                                          context=serializer_context)
