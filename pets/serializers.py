@@ -29,6 +29,11 @@ class PetSerializer(serializers.ModelSerializer):
         model = Pet
         fields = ('id', 'name', 'age', 'type', 'photos', 'created_at',)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        serializer_context = {'request': self.context.get('request')}
+        self.fields['photos'].context.update(serializer_context)
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
 

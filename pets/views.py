@@ -26,7 +26,8 @@ class PetView(generics.ListAPIView,
         page = self.paginate_queryset(queryset)
         data = queryset if page is None else page
 
-        serializer_context = {'has_photos': qp.validated_data['has_photos']}
+        serializer_context = {'has_photos': qp.validated_data['has_photos'],
+                              'request': request}
         serializer = self.get_serializer(data,
                                          many=True,
                                          context=serializer_context)
