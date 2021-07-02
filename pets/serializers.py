@@ -48,11 +48,24 @@ class PetSerializer(serializers.ModelSerializer):
         return representation
 
 
-class DeleteResponseDataSerializer(serializers.Serializer):
+class DeleteResponseSerializer(serializers.Serializer):
     deleted = serializers.IntegerField(read_only=True)
     errors = serializers.ListField(
         child=serializers.DictField(child=serializers.CharField())
     )
+
+
+class ListResponseSerializer(serializers.Serializer):
+    count = serializers.SerializerMethodField('get_count')
+    items = serializers.SerializerMethodField('get_items')
+
+    @staticmethod
+    def get_count(instance_list):
+        return len(instance_list)
+
+    def get_items(self, instance_list):
+        serializer = self.context.pop('model_serializer')
+        return serializer(instance_list, many=True, context=self.context).data
 
 
 class PetViewGetQueryParamsSerializer(serializers.Serializer):
