@@ -20,36 +20,36 @@ class PetView(generics.ListAPIView,
     serializer_class = PetSerializer
 
     def get(self, request, **kwargs):
-        qp = PetViewGetQueryParamsSerializer(data=request.query_params)
+        qp = PetViewGetQueryParamsSerializer(request.query_params)
         qp.is_valid(raise_exception=True)
 
         queryset = self.get_queryset()
-        page = self.paginate_queryset(queryset)
-        data = queryset if page is None else page
-
+        if self.paginator:
+            queryset = self.paginate_queryset(queryset)
         serializer_context = {'has_photos': qp.validated_data['has_photos'],
                               'request': request,
                               'model_serializer': PetSerializer}
-        serializer = ListResponseSerializer(data, context=serializer_context)
+        serializer = ListResponseSerializer(queryset,
+                                            context=serializer_context)
         return Response(data=serializer.data)
 
     def delete(self, request, **kwargs):
         str_uuids = request.data['ids']
         queryset = self.get_queryset()
 
-        response_data = DeleteResponseData()
+        response = DeleteResponse()
         for str_uuid in str_uuids:
             try:
                 pet_uuid = uuid.UUID(str_uuid)
                 queryset.get(uuid=pet_uuid).delete()
             except Pet.DoesNotExist:
-                response_data.append_error(str_uuid,
-                                           'Pet with the matching ID was not found.')
+                response.append_error(str_uuid,
+                                      'Pet with the matching ID was not found.')
             except Exception as e:
-                response_data.append_error(str_uuid, str(e))
+                response.append_error(str_uuid, str(e))
             else:
-                response_data.deleted += 1
-        serializer = DeleteResponseSerializer(response_data)
+                response.deleted += 1
+        serializer = DeleteResponseSerializer(response)
         return Response(data=serializer.data,
                         status=status.HTTP_204_NO_CONTENT)
 
@@ -77,7 +77,7 @@ class PhotoUploadView(generics.CreateAPIView,
                         status=status.HTTP_201_CREATED)
 
 
-class DeleteResponseData:
+class DeleteResponse:
     def __init__(self):
         self.deleted = 0
         self.errors = []
