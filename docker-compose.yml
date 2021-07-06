@@ -15,6 +15,18 @@ services:
       - postgres_volume:/var/lib/postgresql/data/
     env_file:
       - .env.db
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    volumes:
+      - ./static/:/static
+    depends_on:
+      - web
+      - db
+    ports:
+      - 80:80
+
 
 volumes:
   postgres_volume:
