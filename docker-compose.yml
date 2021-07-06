@@ -21,6 +21,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./static/:/static
+      - ./media/:/media
     depends_on:
       - web
       - db
