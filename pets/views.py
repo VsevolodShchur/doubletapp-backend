@@ -20,12 +20,13 @@ class PetView(generics.ListAPIView,
     serializer_class = PetSerializer
 
     def get(self, request, **kwargs):
-        qp = PetViewGetQueryParamsSerializer(request.query_params)
+        qp = PetViewGetQueryParamsSerializer(data=request.query_params)
         qp.is_valid(raise_exception=True)
 
         queryset = self.get_queryset()
-        if self.paginator:
-            queryset = self.paginate_queryset(queryset)
+        page = self.paginate_queryset(queryset)
+        if page:
+            queryset = page
         serializer_context = {'has_photos': qp.validated_data['has_photos'],
                               'request': request,
                               'model_serializer': PetSerializer}
