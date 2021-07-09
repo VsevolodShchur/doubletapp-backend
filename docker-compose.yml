@@ -27,16 +27,20 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile
+    environment:
+      - DOMAIN=${DOMAIN}
     volumes:
       - ./static/:/static
       - ./media/:/media
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
+      - ./dhparam:/etc/ssl/certs
     depends_on:
       - web
       - db
     ports:
       - 80:80
+      - 443:443
     restart: unless-stopped
     networks:
       - app-network
@@ -54,7 +58,7 @@ services:
       certonly --webroot --webroot-path=/
         --email example@mail.com
         --agree-tos --no-eff-email --staging
-        -d "$DOMAIN"
+        -d ${DOMAIN}
 
 volumes:
   postgres_volume:
