@@ -7,11 +7,12 @@ services:
       - ./:/usr/src/app/
     expose:
       - 8000
+    environment:
+      - DOMAIN
     env_file:
-      - env/.env
+      - env/django.env
+      - env/postgres.env
     restart: unless-stopped
-    networks:
-      - app-network
 
   db:
     image: postgres:12.0-alpine
@@ -20,20 +21,16 @@ services:
     env_file:
       - env/postgres.env
     restart: unless-stopped
-    networks:
-      - app-network
 
   nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
+    build: ./nginx
     environment:
-      - DOMAIN=${DOMAIN}
+      - DOMAIN
     volumes:
       - ./static/:/static
       - ./media/:/media
       - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
+      - certbot-webroot:/var/lib/letsencrypt
       - ./dhparam:/etc/ssl/certs
     depends_on:
       - web
@@ -42,29 +39,22 @@ services:
       - 80:80
       - 443:443
     restart: unless-stopped
-    networks:
-      - app-network
 
   certbot:
     image: certbot/certbot
     volumes:
       - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
+      - certbot-webroot:/var/lib/letsencrypt
     depends_on:
       - nginx
-    env_file:
-      - env/compose.env
     command: >
-      certonly --webroot --webroot-path=/
+      certonly -v --webroot --webroot-path=/var/lib/letsencrypt
         --email example@mail.com
+        --non-interactive
         --agree-tos --no-eff-email --staging
         -d ${DOMAIN}
 
 volumes:
   postgres_volume:
   certbot-etc:
-  certbot-var:
-
-networks:
-  app-network:
-    driver: bridge
+  certbot-webroot:
