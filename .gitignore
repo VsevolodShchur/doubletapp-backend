@@ -129,6 +129,6 @@ dmypy.json
 .pyre/
 
 .idea/
-/media/
-/static/
+/django/media/
+/django/static/
 dhparam/

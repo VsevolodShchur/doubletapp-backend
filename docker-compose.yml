@@ -4,7 +4,7 @@ services:
   web:
     build: ./
     volumes:
-      - ./:/usr/src/app/
+      - .django/:/usr/src/app/
     expose:
       - 8000
     environment:
@@ -27,8 +27,8 @@ services:
     environment:
       - DOMAIN
     volumes:
-      - ./static/:/static
-      - ./media/:/media
+      - ./django/static/:/static
+      - ./django/media/:/media
       - certbot-etc:/etc/letsencrypt
       - certbot-webroot:/var/lib/letsencrypt
       - ./dhparam:/etc/ssl/certs
