@@ -4,9 +4,11 @@ python manage.py makemigrations --no-input
 
 python manage.py migrate --no-input
 
-envsubst < ./fixtures/sitesdata.template.json > ./fixtures/sitesdata.json
+cd ./pets/fixtures/
+envsubst < sitesdata.template.json > sitesdata.json
+cd ../..
 python manage.py loaddata sitesdata
-rm ./fixtures/sitesdata.json
+rm ./pets/fixtures/sitesdata.json
 
 python manage.py collectstatic --no-input
 
