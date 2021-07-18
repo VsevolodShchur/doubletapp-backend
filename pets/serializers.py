@@ -18,7 +18,7 @@ class PhotoSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(photo_path)
 
         domain = Site.objects.get_current().domain
-        return f'http://{domain}{photo_path}'
+        return f'https://{domain}{photo_path}'
 
 
 class PetSerializer(serializers.ModelSerializer):
