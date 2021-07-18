@@ -7,7 +7,8 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apk update \
     && apk add postgresql-dev gcc python3-dev musl-dev \
-    && apk add jpeg-dev zlib-dev libjpeg
+    && apk add jpeg-dev zlib-dev libjpeg \
+    && apk add envsubst
 
 RUN pip install --upgrade pip
 COPY ./requirements.txt .
@@ -18,4 +19,4 @@ RUN chmod +x entrypoint.sh
 
 COPY . .
 
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+ENTRYPOINT ["sh", "/usr/src/app/entrypoint.sh"]
