@@ -9,14 +9,14 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--has_photos',
+            '--has-photos',
             action='store_true',
             help='Include photos',
         )
 
     def handle(self, *args, **options):
         serializer_context = {
-            'has_photos': options['has_photos'],
+            'has_photos': options['has-photos'],
             'photos_as_url_list': True
         }
         serializer = PetSerializer(Pet.objects.all(),
