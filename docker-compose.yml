@@ -9,6 +9,9 @@ services:
       - 8000
     environment:
       - DOMAIN
+      - POSTGRES_ENGINE=django.db.backends.postgresql
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
     env_file:
       - env/django.env
       - env/postgres.env
