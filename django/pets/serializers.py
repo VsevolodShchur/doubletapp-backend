@@ -37,10 +37,7 @@ class PetSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
 
-        if not self.context.get('has_photos', False):
-            representation.pop('photos')
-
-        elif self.context.get('photos_as_url_list', False):
+        if self.context.get('photos_as_url_list', False):
             photos = representation['photos']
             urls = [photo['url'] for photo in photos]
             representation['photos'] = urls
@@ -75,4 +72,5 @@ class ListResponseSerializer(serializers.Serializer):
 class PetViewGetQueryParamsSerializer(serializers.Serializer):
     limit = serializers.IntegerField(required=False, min_value=0)
     offset = serializers.IntegerField(required=False, min_value=0)
-    has_photos = serializers.BooleanField(required=False, default=True)
+    has_photos = serializers.BooleanField(required=False, allow_null=True,
+                                          default=None)

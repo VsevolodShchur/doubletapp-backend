@@ -24,14 +24,16 @@ class PetView(generics.ListAPIView,
         qp.is_valid(raise_exception=True)
 
         queryset = self.get_queryset()
+        has_photos = qp.validated_data['has_photos']
+        if has_photos is not None:
+            queryset = queryset.filter(photo__isnull=not has_photos)
+
         page = self.paginate_queryset(queryset)
         if page:
             queryset = page
-        serializer_context = {'has_photos': qp.validated_data['has_photos'],
-                              'request': request}
         serializer = ListResponseSerializer(queryset, 
                                             model_serializer=PetSerializer,
-                                            context=serializer_context)
+                                            context={'request': request})
         return Response(data=serializer.data)
 
     def delete(self, request, **kwargs):

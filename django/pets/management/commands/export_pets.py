@@ -9,19 +9,21 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--has-photos',
-            action='store_true',
-            help='Include photos',
+            '--has_photos',
+            choices=['true', 'false'],
+            help='Filter data; true=export pets with photos, false=export pets without photos',
         )
 
     def handle(self, *args, **options):
-        serializer_context = {
-            'has_photos': options['has-photos'],
-            'photos_as_url_list': True
-        }
-        serializer = PetSerializer(Pet.objects.all(),
+        has_photos = options['has_photos']
+
+        pets_data = Pet.objects.all()
+        if has_photos:
+            pets_data = pets_data.filter(photo__isnull=has_photos != 'true')
+
+        serializer = PetSerializer(pets_data,
                                    many=True,
-                                   context=serializer_context)
+                                   context={'photos_as_url_list': True})
         content = JSONRenderer().render({'pets': serializer.data},
                                         renderer_context={'indent': 4})
         self.stdout.write(content.decode('utf-8'))
