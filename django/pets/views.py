@@ -36,13 +36,12 @@ class PetView(generics.ListAPIView,
 
     def delete(self, request, **kwargs):
         str_uuids = request.data['ids']
-        queryset = self.get_queryset()
 
         response = DeleteResponse()
         for str_uuid in str_uuids:
             try:
                 pet_uuid = uuid.UUID(str_uuid)
-                queryset.get(uuid=pet_uuid).delete()
+                Pet.objects.get(uuid=pet_uuid).delete()
             except Pet.DoesNotExist:
                 response.append_error(str_uuid,
                                       'Pet with the matching ID was not found.')
