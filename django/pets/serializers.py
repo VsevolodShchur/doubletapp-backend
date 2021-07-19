@@ -59,13 +59,17 @@ class ListResponseSerializer(serializers.Serializer):
     count = serializers.SerializerMethodField('get_count')
     items = serializers.SerializerMethodField('get_items')
 
+    def __init__(self, *args, **kwargs):
+        self.serializer = kwargs.pop('model_serializer')
+        super().__init__(*args, **kwargs)
+
     @staticmethod
     def get_count(instance_list):
         return len(instance_list)
 
     def get_items(self, instance_list):
-        serializer = self.context.pop('model_serializer')
-        return serializer(instance_list, many=True, context=self.context).data
+        serializer = self.serializer(instance_list, many=True, context=self.context)
+        return serializer.data
 
 
 class PetViewGetQueryParamsSerializer(serializers.Serializer):

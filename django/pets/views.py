@@ -28,9 +28,9 @@ class PetView(generics.ListAPIView,
         if page:
             queryset = page
         serializer_context = {'has_photos': qp.validated_data['has_photos'],
-                              'request': request,
-                              'model_serializer': PetSerializer}
-        serializer = ListResponseSerializer(queryset,
+                              'request': request}
+        serializer = ListResponseSerializer(queryset, 
+                                            model_serializer=PetSerializer,
                                             context=serializer_context)
         return Response(data=serializer.data)
 
