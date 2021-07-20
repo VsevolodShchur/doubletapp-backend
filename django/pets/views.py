@@ -3,11 +3,9 @@ from .serializers import PetSerializer, PhotoSerializer, \
                          PetViewGetQueryParamsSerializer, \
                          DeleteResponseSerializer, \
                          ListResponseSerializer
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser
 from rest_framework.exceptions import ParseError, NotFound
-from rest_framework import status, generics
+from rest_framework import status, generics, pagination, parsers
 from django.db import IntegrityError
 import uuid
 
@@ -15,7 +13,7 @@ import uuid
 class PetView(generics.ListAPIView,
               generics.CreateAPIView,
               generics.DestroyAPIView):
-    pagination_class = LimitOffsetPagination
+    pagination_class = pagination.LimitOffsetPagination
     serializer_class = PetSerializer
 
     def get_queryset(self):
@@ -26,7 +24,7 @@ class PetView(generics.ListAPIView,
         has_photos = has_photos_param == 'true'
         return Pet.objects.filter(photo__isnull=not has_photos)
 
-    def get(self, request, **kwargs):
+    def list(self, request, **kwargs):
         qp = PetViewGetQueryParamsSerializer(data=request.query_params)
         qp.is_valid(raise_exception=True)
 
@@ -39,7 +37,7 @@ class PetView(generics.ListAPIView,
                                             context={'request': request})
         return Response(data=serializer.data)
 
-    def delete(self, request, **kwargs):
+    def destroy(self, request, **kwargs):
         str_uuids = request.data['ids']
         response = DeleteResponse()
         for str_uuid in str_uuids:
@@ -61,10 +59,10 @@ class PetView(generics.ListAPIView,
 class PhotoUploadView(generics.CreateAPIView,
                       generics.RetrieveAPIView):
     queryset = Photo.objects.all()
-    parser_classes = [MultiPartParser]
+    parser_classes = [parsers.MultiPartParser]
     serializer_class = PhotoSerializer
 
-    def post(self, request, **kwargs):
+    def create(self, request, **kwargs):
         if 'file' not in request.data:
             raise ParseError(detail='No file in request.')
 
