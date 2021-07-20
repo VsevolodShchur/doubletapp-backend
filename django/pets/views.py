@@ -15,19 +15,22 @@ import uuid
 class PetView(generics.ListAPIView,
               generics.CreateAPIView,
               generics.DestroyAPIView):
-    queryset = Pet.objects.all()
     pagination_class = LimitOffsetPagination
     serializer_class = PetSerializer
+
+    def get_queryset(self):
+        has_photos_param = self.request.query_params.get('has_photos')
+        if not has_photos_param:
+            return Pet.objects.all()
+
+        has_photos = has_photos_param == 'true'
+        return Pet.objects.filter(photo__isnull=not has_photos)
 
     def get(self, request, **kwargs):
         qp = PetViewGetQueryParamsSerializer(data=request.query_params)
         qp.is_valid(raise_exception=True)
 
         queryset = self.get_queryset()
-        has_photos = qp.validated_data['has_photos']
-        if has_photos is not None:
-            queryset = queryset.filter(photo__isnull=not has_photos)
-
         page = self.paginate_queryset(queryset)
         if page:
             queryset = page
@@ -38,7 +41,6 @@ class PetView(generics.ListAPIView,
 
     def delete(self, request, **kwargs):
         str_uuids = request.data['ids']
-
         response = DeleteResponse()
         for str_uuid in str_uuids:
             try:
