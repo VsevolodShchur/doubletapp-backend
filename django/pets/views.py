@@ -56,7 +56,7 @@ class PetView(generics.ListAPIView,
                         status=status.HTTP_204_NO_CONTENT)
 
 
-class PhotoUploadView(generics.CreateAPIView,
+class PhotoView(generics.CreateAPIView,
                       generics.RetrieveAPIView):
     queryset = Photo.objects.all()
     parser_classes = [parsers.MultiPartParser]
