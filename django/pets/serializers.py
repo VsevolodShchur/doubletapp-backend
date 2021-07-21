@@ -56,8 +56,8 @@ class ListResponseSerializer(serializers.Serializer):
     count = serializers.SerializerMethodField('get_count')
     items = serializers.SerializerMethodField('get_items')
 
-    def __init__(self, *args, **kwargs):
-        self.serializer = kwargs.pop('model_serializer')
+    def __init__(self, *args, model_serializer, **kwargs):
+        self.serializer = model_serializer
         super().__init__(*args, **kwargs)
 
     @staticmethod
