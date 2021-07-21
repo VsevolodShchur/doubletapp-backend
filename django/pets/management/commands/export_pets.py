@@ -4,7 +4,7 @@ from pets.models import Pet
 from pets.serializers import PetSerializer
 
 
-class Command(BaseCommand):
+class ExportPets(BaseCommand):
     help = 'Export pets data'
 
     def add_arguments(self, parser):
