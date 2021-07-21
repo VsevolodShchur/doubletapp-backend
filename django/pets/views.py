@@ -6,7 +6,7 @@ from .serializers import PetSerializer, PhotoSerializer, \
 from rest_framework.response import Response
 from rest_framework.exceptions import ParseError, NotFound
 from rest_framework import status, generics, pagination, parsers
-from django.db import IntegrityError
+from django.core.exceptions import ValidationError
 import uuid
 
 
@@ -38,22 +38,20 @@ class PetView(generics.ListAPIView,
         return Response(data=serializer.data)
 
     def destroy(self, request, **kwargs):
-        str_uuids = request.data['ids']
+        uuids = request.data['ids']
         response = DeleteResponse()
-        for str_uuid in str_uuids:
+        for pet_uuid in uuids:
             try:
-                pet_uuid = uuid.UUID(str_uuid)
-                Pet.objects.get(uuid=pet_uuid).delete()
+                pet = Pet.objects.get(uuid=pet_uuid)
             except Pet.DoesNotExist:
-                response.append_error(str_uuid,
-                                      'Pet with the matching ID was not found.')
-            except Exception as e:
-                response.append_error(str_uuid, str(e))
+                response.append_error(pet_uuid, 'Pet with the matching ID was not found.')
+            except ValidationError as e:
+                response.append_error(pet_uuid, e.message % {'value': pet_uuid})
             else:
+                pet.delete()
                 response.deleted += 1
         serializer = DeleteResponseSerializer(response)
-        return Response(data=serializer.data,
-                        status=status.HTTP_204_NO_CONTENT)
+        return Response(data=serializer.data)
 
 
 class PhotoView(generics.CreateAPIView,
@@ -73,7 +71,7 @@ class PhotoView(generics.CreateAPIView,
         except Pet.DoesNotExist:
             raise NotFound()
         photo = Photo(file=file, pet_id=pet_uuid)
-            photo.save()
+        photo.save()
         serializer = self.get_serializer(photo)
         return Response(data=serializer.data,
                         status=status.HTTP_201_CREATED)
