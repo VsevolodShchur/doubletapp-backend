@@ -39,7 +39,7 @@ class PetView(generics.ListAPIView,
 
     def destroy(self, request, **kwargs):
         uuids = request.data['ids']
-        response = DeleteResponse()
+        response = DestroyResponse()
         for pet_uuid in uuids:
             try:
                 pet = Pet.objects.get(uuid=pet_uuid)
@@ -55,7 +55,7 @@ class PetView(generics.ListAPIView,
 
 
 class PhotoView(generics.CreateAPIView,
-                      generics.RetrieveAPIView):
+                generics.RetrieveAPIView):
     queryset = Photo.objects.all()
     parser_classes = [parsers.MultiPartParser]
     serializer_class = PhotoSerializer
@@ -77,7 +77,7 @@ class PhotoView(generics.CreateAPIView,
                         status=status.HTTP_201_CREATED)
 
 
-class DeleteResponse:
+class DestroyResponse:
     def __init__(self):
         self.deleted = 0
         self.errors = []
