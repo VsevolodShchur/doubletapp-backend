@@ -1,6 +1,6 @@
 # doubletapp-backend
 
-REST API для ведения учета питомцев (собак и кошек) с возможностью выгрузки списка питомцев через комндную строкую.
+REST API для ведения учета питомцев (собак и кошек) с возможностью выгрузки списка питомцев через командную строкую.
 
 ## API
 ### 1. POST /pets
@@ -60,10 +60,10 @@ has_photos: boolean (optional)
 <br>
 
 ## Деплой
-### Перед первым запуском
+### Первый запуск
 Запустить скрипт `generate_dh_param.sh` для генерации ключа Диффи-Хеллмана.
 
-Из конфигурационного файла Nginx `/nginx/nginx.template.conf` убрать директиву cервера, слушающего 443 порт, чтобы Let's encrypt выполнил ACME-протокол. После генерации сертификата перезапустить Nginx с полным конфигурационным файлом.
+Из конфигурационного файла Nginx `/nginx/nginx.template.conf` убрать контекст cервера, слушающего 443 порт, чтобы Let's encrypt выполнил ACME-протокол. После получения сертификата перезапустить Nginx с полным конфигурационным файлом.
 ### Переменные окружения
 #### /env/django.env
 ```
@@ -94,5 +94,5 @@ docker-compose up -d
 Выгрузка питомцев в **stdout** с параметром has_photos: boolean (optional)
 
 ```
-docker-compose exec web python manage.py export_pets
+docker-compose exec web python manage.py export_pets [--has_photos {true,false}]
 ```
