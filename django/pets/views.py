@@ -68,12 +68,12 @@ class PhotoView(generics.CreateAPIView,
 
         file = request.data['file']
         pet_uuid = kwargs.get('pet_uuid')
-        photo = Photo(file=file, pet_id=pet_uuid)
         try:
-            photo.save()
-        except IntegrityError:
+            Pet.objects.get(uuid=pet_uuid)
+        except Pet.DoesNotExist:
             raise NotFound()
-
+        photo = Photo(file=file, pet_id=pet_uuid)
+            photo.save()
         serializer = self.get_serializer(photo)
         return Response(data=serializer.data,
                         status=status.HTTP_201_CREATED)
