@@ -45,7 +45,7 @@ class PetSerializer(serializers.ModelSerializer):
         return representation
 
 
-class DeleteResponseSerializer(serializers.Serializer):
+class DestroyResponseSerializer(serializers.Serializer):
     deleted = serializers.IntegerField(read_only=True)
     errors = serializers.ListField(
         child=serializers.DictField(child=serializers.CharField())
@@ -69,7 +69,7 @@ class ListResponseSerializer(serializers.Serializer):
         return serializer.data
 
 
-class PetViewGetQueryParamsSerializer(serializers.Serializer):
+class PetViewListQueryParamsSerializer(serializers.Serializer):
     limit = serializers.IntegerField(required=False, min_value=0)
     offset = serializers.IntegerField(required=False, min_value=0)
     has_photos = serializers.BooleanField(required=False, allow_null=True,

@@ -1,7 +1,7 @@
 from .models import Pet, Photo
 from .serializers import PetSerializer, PhotoSerializer, \
-                         PetViewGetQueryParamsSerializer, \
-                         DeleteResponseSerializer, \
+                         PetViewListQueryParamsSerializer, \
+                         DestroyResponseSerializer, \
                          ListResponseSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import ParseError, NotFound
@@ -25,7 +25,7 @@ class PetView(generics.ListAPIView,
         return Pet.objects.filter(photo__isnull=not has_photos)
 
     def list(self, request, **kwargs):
-        qp = PetViewGetQueryParamsSerializer(data=request.query_params)
+        qp = PetViewListQueryParamsSerializer(data=request.query_params)
         qp.is_valid(raise_exception=True)
 
         queryset = self.get_queryset()
@@ -50,7 +50,7 @@ class PetView(generics.ListAPIView,
             else:
                 pet.delete()
                 response.deleted += 1
-        serializer = DeleteResponseSerializer(response)
+        serializer = DestroyResponseSerializer(response)
         return Response(data=serializer.data)
 
 
