@@ -4,7 +4,7 @@ from pets.models import Pet
 from pets.serializers import PetSerializer
 
 
-class ExportPets(BaseCommand):
+class Command(BaseCommand):
     """
     Команда выгрузки питомцев
     """
