@@ -24,7 +24,7 @@ class PetView(generics.ListAPIView,
             return Pet.objects.all()
 
         has_photos = has_photos_param == 'true'
-        return Pet.objects.filter(photo__isnull=not has_photos)
+        return Pet.objects.filter(photo__isnull=not has_photos).distinct()
 
     def list(self, request, **kwargs):
         qp = PetViewListQueryParamsSerializer(data=request.query_params)
