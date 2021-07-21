@@ -4,6 +4,9 @@ from .models import Pet, Photo
 
 
 class PhotoSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор модели Photo
+    """
     id = serializers.CharField(source='uuid')
     url = serializers.SerializerMethodField('get_photo_url')
 
@@ -18,10 +21,13 @@ class PhotoSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(photo_path)
 
         domain = Site.objects.get_current().domain
-        return f'http://{domain}{photo_path}'
+        return f'https://{domain}{photo_path}'
 
 
 class PetSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор модели Pet
+    """
     id = serializers.CharField(source='uuid', read_only=True)
     photos = PhotoSerializer(source='photo_set', read_only=True, many=True)
 
@@ -37,10 +43,7 @@ class PetSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
 
-        if not self.context.get('has_photos', False):
-            representation.pop('photos')
-
-        elif self.context.get('photos_as_url_list', False):
+        if self.context.get('photos_as_url_list', False):
             photos = representation['photos']
             urls = [photo['url'] for photo in photos]
             representation['photos'] = urls
@@ -48,7 +51,10 @@ class PetSerializer(serializers.ModelSerializer):
         return representation
 
 
-class DeleteResponseSerializer(serializers.Serializer):
+class DestroyResponseSerializer(serializers.Serializer):
+    """
+    Сериализатор класса DestroyResponse
+    """
     deleted = serializers.IntegerField(read_only=True)
     errors = serializers.ListField(
         child=serializers.DictField(child=serializers.CharField())
@@ -56,19 +62,30 @@ class DeleteResponseSerializer(serializers.Serializer):
 
 
 class ListResponseSerializer(serializers.Serializer):
+    """
+    Сериализатор ответа на запрос списка объектов
+    """
     count = serializers.SerializerMethodField('get_count')
     items = serializers.SerializerMethodField('get_items')
+
+    def __init__(self, *args, model_serializer, **kwargs):
+        self.serializer = model_serializer
+        super().__init__(*args, **kwargs)
 
     @staticmethod
     def get_count(instance_list):
         return len(instance_list)
 
     def get_items(self, instance_list):
-        serializer = self.context.pop('model_serializer')
-        return serializer(instance_list, many=True, context=self.context).data
+        serializer = self.serializer(instance_list, many=True, context=self.context)
+        return serializer.data
 
 
-class PetViewGetQueryParamsSerializer(serializers.Serializer):
+class PetViewListQueryParamsSerializer(serializers.Serializer):
+    """
+    Сериализатор параметров запроса списка питомцев
+    """
     limit = serializers.IntegerField(required=False, min_value=0)
     offset = serializers.IntegerField(required=False, min_value=0)
-    has_photos = serializers.BooleanField(required=False, default=True)
+    has_photos = serializers.BooleanField(required=False, allow_null=True,
+                                          default=None)

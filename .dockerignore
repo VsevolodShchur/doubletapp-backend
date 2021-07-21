@@ -6,3 +6,7 @@ db.sqlite3
 readme.md
 /media
 /static
+/nginx
+/dhparam
+generate_dh_param.sh
+README.md
