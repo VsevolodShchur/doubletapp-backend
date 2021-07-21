@@ -7,12 +7,14 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ParseError, NotFound
 from rest_framework import status, generics, pagination, parsers
 from django.core.exceptions import ValidationError
-import uuid
 
 
 class PetView(generics.ListAPIView,
               generics.CreateAPIView,
               generics.DestroyAPIView):
+    """
+    View на получение списка, создание и удаление питомцев
+    """
     pagination_class = pagination.LimitOffsetPagination
     serializer_class = PetSerializer
 
@@ -56,6 +58,9 @@ class PetView(generics.ListAPIView,
 
 class PhotoView(generics.CreateAPIView,
                 generics.RetrieveAPIView):
+    """
+    View на загрузку и получение фотографий питомцев
+    """
     queryset = Photo.objects.all()
     parser_classes = [parsers.MultiPartParser]
     serializer_class = PhotoSerializer
@@ -78,6 +83,9 @@ class PhotoView(generics.CreateAPIView,
 
 
 class DestroyResponse:
+    """
+    Ответ на запрос удаления списка объектов
+    """
     def __init__(self):
         self.deleted = 0
         self.errors = []

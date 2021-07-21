@@ -4,6 +4,9 @@ from pets import settings
 
 
 class ApiKeyAuthentication(authentication.BaseAuthentication):
+    """
+    Аутентификация по ключу settings.API_KEY
+    """
     def authenticate(self, request):
         if request.META.get('HTTP_X_API_KEY') != settings.API_KEY:
             raise exceptions.AuthenticationFailed('Invalid Api Key')

@@ -4,6 +4,9 @@ from .models import Pet, Photo
 
 
 class PhotoSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор модели Photo
+    """
     id = serializers.CharField(source='uuid')
     url = serializers.SerializerMethodField('get_photo_url')
 
@@ -22,6 +25,9 @@ class PhotoSerializer(serializers.ModelSerializer):
 
 
 class PetSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор модели Pet
+    """
     id = serializers.CharField(source='uuid', read_only=True)
     photos = PhotoSerializer(source='photo_set', read_only=True, many=True)
 
@@ -46,6 +52,9 @@ class PetSerializer(serializers.ModelSerializer):
 
 
 class DestroyResponseSerializer(serializers.Serializer):
+    """
+    Сериализатор класса DestroyResponse
+    """
     deleted = serializers.IntegerField(read_only=True)
     errors = serializers.ListField(
         child=serializers.DictField(child=serializers.CharField())
@@ -53,6 +62,9 @@ class DestroyResponseSerializer(serializers.Serializer):
 
 
 class ListResponseSerializer(serializers.Serializer):
+    """
+    Сериализатор ответа на запрос списка объектов
+    """
     count = serializers.SerializerMethodField('get_count')
     items = serializers.SerializerMethodField('get_items')
 
@@ -70,6 +82,9 @@ class ListResponseSerializer(serializers.Serializer):
 
 
 class PetViewListQueryParamsSerializer(serializers.Serializer):
+    """
+    Сериализатор параметров запроса списка питомцев
+    """
     limit = serializers.IntegerField(required=False, min_value=0)
     offset = serializers.IntegerField(required=False, min_value=0)
     has_photos = serializers.BooleanField(required=False, allow_null=True,

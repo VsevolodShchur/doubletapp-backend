@@ -3,6 +3,9 @@ from django.db import models
 
 
 class Pet(models.Model):
+    """
+    Модель питомца
+    """
     class PetsChoices(models.Choices):
         dog = 'dog'
         cat = 'cat'
@@ -18,6 +21,9 @@ class Pet(models.Model):
 
 
 class Photo(models.Model):
+    """
+    Модель фотографии питомца
+    """
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     file = models.ImageField(upload_to='photos/')
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, to_field='uuid')

@@ -5,6 +5,9 @@ from pets.serializers import PetSerializer
 
 
 class ExportPets(BaseCommand):
+    """
+    Команда выгрузки питомцев
+    """
     help = 'Export pets data'
 
     def add_arguments(self, parser):
